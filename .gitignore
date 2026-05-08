@@ -13,3 +13,6 @@ server/uploads/*
 
 .DS_Store
 Thumbs.db
+images/
+Client-side/build/
+Client-side/public
