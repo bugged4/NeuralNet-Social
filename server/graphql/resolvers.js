@@ -2,6 +2,7 @@ const { GraphQLError } = require('graphql');
 
 const Post = require('../models/Post');
 const User = require('../models/User');
+const { getRecommendedPosts } = require('../services/recommendationService');
 
 const clampPagination = (page, limit) => {
   const safePage = Math.max(Number(page) || 1, 1);
@@ -144,22 +145,34 @@ const resolvers = {
         ];
       }
 
-      // Personalized exploration stays intentionally simple for Phase 1:
-      // prefer tags the current user has recently used, then fall back to recency.
       if (context.user && !args.tag && !args.search) {
-        const recentUserPosts = await Post.find({ user: context.user._id })
-          .sort({ createdAt: -1 })
-          .limit(20)
-          .select('tags')
-          .lean();
-        const preferredTags = [...new Set(recentUserPosts.flatMap((post) => post.tags || []))];
+        const recommendations = await getRecommendedPosts({
+          userId: context.user._id,
+          page: args.page,
+          limit: args.limit
+        });
 
-        if (preferredTags.length > 0) {
-          query.tags = { $in: preferredTags };
-        }
+        return {
+          items: recommendations.items.map((item) => item.post),
+          pageInfo: recommendations.pageInfo
+        };
       }
 
       return postConnection(query, args.page, args.limit);
+    },
+
+    recommendedPosts: async (_parent, args, context) => {
+      if (!context.user) {
+        throw new GraphQLError('Authentication required', {
+          extensions: { code: 'UNAUTHENTICATED', http: { status: 401 } }
+        });
+      }
+
+      return getRecommendedPosts({
+        userId: context.user._id,
+        page: args.page,
+        limit: args.limit
+      });
     },
 
     profile: async (_parent, args) => {

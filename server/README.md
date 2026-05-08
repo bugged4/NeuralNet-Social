@@ -14,6 +14,7 @@ server/
 │   ├── authController.js
 │   ├── likeController.js
 │   ├── postController.js
+│   ├── recommendationController.js
 │   └── uploadController.js
 ├── middleware/
 │   ├── authMiddleware.js
@@ -33,6 +34,7 @@ server/
 │   ├── authRoutes.js
 │   ├── likeRoutes.js
 │   ├── postRoutes.js
+│   ├── recommendationRoutes.js
 │   └── uploadRoutes.js
 ├── services/
 │   ├── moderationService.js
@@ -219,6 +221,60 @@ Example response:
 }
 ```
 
+### Recommendations
+
+`GET /api/recommendations/posts?page=1&limit=10`
+
+Header:
+
+```text
+Authorization: Bearer <token>
+```
+
+Recommendations are produced by the independent `services/recommendationService.js` layer. It currently uses deterministic ranking signals so it is safe for production and easy to replace later with an AI ranking microservice.
+
+Signals used:
+
+- liked posts
+- followed users
+- shared tags/interests
+- engagement
+- recent activity
+
+Example response:
+
+```json
+{
+  "success": true,
+  "recommendations": [
+    {
+      "post": {
+        "id": "POST_ID",
+        "body": "AI tools for creators",
+        "tags": ["ai", "creators"],
+        "likeCount": 12,
+        "commentCount": 3
+      },
+      "score": 72.41,
+      "reasons": ["from_followed_user", "shared_tags:ai", "high_engagement"]
+    }
+  ],
+  "pageInfo": {
+    "page": 1,
+    "limit": 10,
+    "total": 42,
+    "pages": 5,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  },
+  "signals": {
+    "followedUserCount": 4,
+    "likedPostCount": 9,
+    "topTags": [{ "tag": "ai", "weight": 20 }]
+  }
+}
+```
+
 ## GraphQL
 
 GraphQL endpoint:
@@ -277,6 +333,45 @@ query ExploreFeed {
 ```
 
 If a JWT is sent and no `tag` or `search` is supplied, the resolver lightly personalizes results from tags the user recently posted.
+
+### Recommended Posts
+
+```graphql
+query RecommendedPosts {
+  recommendedPosts(page: 1, limit: 10) {
+    items {
+      score
+      reasons
+      post {
+        id
+        body
+        tags
+        likeCount
+        commentCount
+        user {
+          id
+          username
+        }
+      }
+    }
+    signals {
+      followedUserCount
+      likedPostCount
+      topTags {
+        tag
+        weight
+      }
+    }
+    pageInfo {
+      page
+      total
+      hasNextPage
+    }
+  }
+}
+```
+
+`recommendedPosts` requires `Authorization: Bearer <token>`. `exploreFeed` also uses the same recommendation service when an authenticated request does not provide `tag` or `search`.
 
 ### Profile Page
 
@@ -350,5 +445,6 @@ query Search {
 - REST `POST /api/auth/register` and `POST /api/auth/login` remain the source of tokens.
 - REST post and like routes remain the write path.
 - GraphQL feed/search/profile queries use the same MongoDB `User` and `Post` models.
+- REST and GraphQL recommendation endpoints both call the same service layer, so future AI ranking can be added in one place.
 - Uploads are REST-only and served from `/uploads/:filename`.
 - `services/recommendationService.js` and `services/moderationService.js` are placeholders for future AI microservices.

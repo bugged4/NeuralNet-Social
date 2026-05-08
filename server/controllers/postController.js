@@ -3,7 +3,7 @@ const asyncHandler = require('express-async-handler');
 const Post = require('../models/Post');
 
 const formatPost = (post) => ({
-  id: post.id,
+  id: post.id || post._id,
   body: post.body,
   username: post.username,
   user: post.user,

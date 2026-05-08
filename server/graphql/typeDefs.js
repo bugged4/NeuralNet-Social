@@ -58,6 +58,33 @@ const typeDefs = `#graphql
     pageInfo: PageInfo!
   }
 
+  type RecommendationReason {
+    code: String!
+  }
+
+  type RecommendedPost {
+    post: Post!
+    score: Float!
+    reasons: [String!]!
+  }
+
+  type RecommendationSignalTag {
+    tag: String!
+    weight: Float!
+  }
+
+  type RecommendationSignals {
+    followedUserCount: Int!
+    likedPostCount: Int!
+    topTags: [RecommendationSignalTag!]!
+  }
+
+  type RecommendationConnection {
+    items: [RecommendedPost!]!
+    pageInfo: PageInfo!
+    signals: RecommendationSignals!
+  }
+
   type Profile {
     user: User!
     posts: PostConnection!
@@ -75,6 +102,7 @@ const typeDefs = `#graphql
   type Query {
     homeFeed(page: Int = 1, limit: Int = 10): PostConnection!
     exploreFeed(page: Int = 1, limit: Int = 10, tag: String, search: String): PostConnection!
+    recommendedPosts(page: Int = 1, limit: Int = 10): RecommendationConnection!
     profile(username: String!, page: Int = 1, limit: Int = 10): Profile
     commentsTree(postId: ID!): [Comment!]!
     search(q: String!, type: String = "ALL", page: Int = 1, limit: Int = 10): SearchConnection!
