@@ -1,15 +1,351 @@
-.page-title {
-  display: block !important;
-  text-align: center;
-  font-size: 2rem;
-  margin-top: 10px;
+:root {
+  --bg: #f5f7fb;
+  --panel: #ffffff;
+  --ink: #17202a;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --teal: #00a99d;
+  --teal-dark: #087f79;
+  --blue: #2563eb;
+  --shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
 }
 
-.form-container {
-  width: 400px;
-  margin: auto;
+* {
+  box-sizing: border-box;
 }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-main {
+  padding: 28px 0 48px;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+}
+
+.ui.secondary.menu.nav-menu {
+  align-items: center;
+  min-height: 64px;
+  margin: 0;
+}
+
+.brand-mark {
+  color: var(--ink) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+.brand-mark .icon {
+  color: var(--teal);
+}
+
+.nav-user {
+  color: var(--muted) !important;
+}
+
+.mobile-menu-toggle {
+  display: none !important;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.feed-header h1.ui.header {
+  margin-bottom: 6px;
+  font-size: 34px;
+}
+
+.feed-header p,
+.muted {
+  color: var(--muted);
+}
+
+.feed-header .ui.input {
+  width: min(320px, 100%);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 12px;
+}
+
+.section-heading h2.ui.header,
+.section-heading h3.ui.header {
+  margin: 0;
+}
+
+.ui.segment.composer,
+.ui.segment.api-card,
+.ui.segment.recommendation-card,
+.ui.segment.center-state,
+.ui.card.post-card,
+.ui.segment.auth-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.composer {
+  margin-bottom: 22px !important;
+}
+
+.composer textarea {
+  resize: vertical !important;
+}
+
+.composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.file-input {
+  display: none;
+}
+
+.image-preview {
+  position: relative;
+  margin: 10px 0 14px;
+}
+
+.image-preview img {
+  max-height: 260px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.image-preview .button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #fff !important;
+}
+
+.post-card {
+  overflow: hidden;
+  margin-bottom: 16px !important;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.avatar-fallback {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--blue));
+  color: white;
+  font-weight: 800;
+}
+
+.avatar-fallback.large {
+  flex-basis: 58px;
+  width: 58px;
+  height: 58px;
+  font-size: 24px;
+}
+
+.post-image-link {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.post-image-link img,
+.detail-image {
+  max-height: 520px;
+  object-fit: cover;
+}
+
+.post-body {
+  color: #2d3748 !important;
+  font-size: 16px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.detail-body {
+  font-size: 18px;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.tag-row.compact {
+  margin-top: 16px;
+}
+
+.metric-button {
+  margin-right: 8px !important;
+}
+
+.center-state {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+}
+
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.side-rail {
+  position: sticky;
+  top: 92px;
+}
+
+.api-card p,
+.recommendation-card p {
+  color: var(--muted);
+}
+
+.recommendation-item {
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.recommendation-item:hover {
+  color: var(--teal-dark);
+}
+
+.recommendation-item strong,
+.recommendation-item span {
+  display: block;
+}
+
+.recommendation-item span {
+  overflow: hidden;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-page {
+  display: grid;
+  min-height: calc(100vh - 140px);
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-panel {
+  width: min(460px, 100%);
+}
+
+.auth-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.auth-heading > .icon {
+  color: var(--teal);
+  font-size: 30px;
+  margin-top: 5px;
+}
+
+.auth-heading h1 {
+  margin: 0 0 4px;
+}
+
+.auth-heading p,
+.auth-switch {
+  color: var(--muted);
+}
+
+.auth-switch {
+  margin: 16px 0 0;
+  text-align: center;
+}
+
+.post-detail-page {
+  max-width: 860px !important;
+}
+
+.back-button {
+  margin-bottom: 16px !important;
+}
+
+.detail-card h2.ui.header {
+  margin-bottom: 4px;
+}
+
+.comments-section {
+  margin-top: 24px;
+}
+
 .ui.teal.button:focus,
 .ui.teal.buttons .button:focus {
-  background-color: #00b5ad;
+  background-color: var(--teal);
+}
+
+@media (max-width: 767px) {
+  .app-main {
+    padding-top: 18px;
+  }
+
+  .feed-header,
+  .composer-actions,
+  .pagination-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .feed-header h1.ui.header {
+    font-size: 28px;
+  }
+
+  .side-rail {
+    position: static;
+  }
+
+  .metric-button {
+    margin-bottom: 8px !important;
+  }
 }
