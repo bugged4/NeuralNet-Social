@@ -26,7 +26,8 @@ const request = async (path, options = {}) => {
   try {
     response = await fetch(`${API_URL}${path}`, {
       ...options,
-      headers
+      headers,
+      credentials: 'include'
     });
   }catch (err) {
   console.error('FETCH ERROR:', err);
