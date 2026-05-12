@@ -1,23 +1,36 @@
+const cloudinary = require('cloudinary').v2;
 const asyncHandler = require('express-async-handler');
 
-const uploadImage = asyncHandler(async (req, res) => {
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const uploadImage = async (req, res) => {
+  console.log('UPLOAD HIT');
+  console.log(req.file);
   if (!req.file) {
     res.status(400);
-    throw new Error('Upload a file using multipart/form-data field "file"');
+    throw new Error('No file uploaded');
   }
+
+  const result = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'auto' },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+
+    stream.end(req.file.buffer);
+  });
 
   res.status(201).json({
     success: true,
-    file: {
-      filename: req.file.filename,
-      originalName: req.file.originalname,
-      mimetype: req.file.mimetype,
-      size: req.file.size,
-      url: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
-    }
+    url: result.secure_url,
   });
-});
+} ;
 
-module.exports = {
-  uploadImage
-};
+module.exports = { uploadImage };

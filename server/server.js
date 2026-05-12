@@ -53,6 +53,8 @@ const startServer = async () => {
 
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
+app.use('/api', uploadRoutes);
   // REST owns authentication, writes, uploads, and operational APIs.
   app.use('/api/auth', authRoutes);
   app.use('/api/posts', postRoutes);

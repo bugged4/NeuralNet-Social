@@ -28,9 +28,10 @@ const request = async (path, options = {}) => {
       ...options,
       headers
     });
-  } catch (_err) {
-    throw new Error('Cannot reach the API server. Check that the backend is running on port 5000.');
-  }
+  }catch (err) {
+  console.error('FETCH ERROR:', err);
+  throw err;
+}
 
   const text = await response.text();
   let data = {};
@@ -80,7 +81,7 @@ const graphql = async ({ query, variables = {}, signal }) => {
       body: JSON.stringify({ query, variables })
     });
   } catch (_err) {
-    throw new Error('Cannot reach the GraphQL server. Check that the backend is running on port 5000.');
+    throw new Error(`Cannot reach the GraphQL API at ${GRAPHQL_URL}. Check VITE_API_URL and make sure the backend is running.`);
   }
 
   const data = await response.json();
@@ -94,7 +95,21 @@ const graphql = async ({ query, variables = {}, signal }) => {
 };
 
 export const api = {
-  health: () => request('/api/health'),
+  health: (options) => request('/api/health', options),
+
+  graphqlHealth: (options) => graphql({
+    query: `
+      query GraphQLHealth {
+        homeFeed(page: 1, limit: 1) {
+          pageInfo {
+            total
+            pages
+          }
+        }
+      }
+    `,
+    ...options
+  }),
 
   login: (values, options) => request('/api/auth/login', {
     method: 'POST',

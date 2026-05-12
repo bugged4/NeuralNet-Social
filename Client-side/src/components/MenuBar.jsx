@@ -3,9 +3,11 @@ import { Container, Icon, Menu } from 'semantic-ui-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../context/auth';
+import { ThemeContext } from '../context/theme';
 
 function MenuBar() {
   const { user, logout } = useContext(AuthContext);
+  const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -33,6 +35,9 @@ function MenuBar() {
             onClick={() => setMobileOpen(false)}
           />
           <Menu.Menu position="right">
+            <Menu.Item onClick={toggleDarkMode} title={isDarkMode ? 'Light mode' : 'Dark mode'}>
+              <Icon name={isDarkMode ? 'sun' : 'moon'} />
+            </Menu.Item>
             {user ? (
               <>
                 <Menu.Item className="nav-user">

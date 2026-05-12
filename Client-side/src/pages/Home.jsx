@@ -16,6 +16,7 @@ import {
 
 import { AuthContext } from '../context/auth';
 import { api } from '../util/api';
+import { API_URL, GRAPHQL_URL } from '../util/api';
 import PostCard from '../components/PostCard';
 import PostForm from '../components/PostForm';
 
@@ -32,6 +33,38 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [recommendationLoading, setRecommendationLoading] = useState(false);
   const [error, setError] = useState('');
+  const [status, setStatus] = useState({
+    rest: { state: 'checking', label: 'Checking REST' },
+    graphql: { state: 'checking', label: 'Checking GraphQL' }
+  });
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function checkBackend() {
+      const [restResult, graphqlResult] = await Promise.allSettled([
+        api.health({ signal: controller.signal }),
+        api.graphqlHealth({ signal: controller.signal })
+      ]);
+
+      if (controller.signal.aborted) {
+        return;
+      }
+
+      setStatus({
+        rest: restResult.status === 'fulfilled'
+          ? { state: 'online', label: 'REST online' }
+          : { state: 'offline', label: restResult.reason?.message || 'REST unavailable' },
+        graphql: graphqlResult.status === 'fulfilled'
+          ? { state: 'online', label: 'GraphQL online' }
+          : { state: 'offline', label: graphqlResult.reason?.message || 'GraphQL unavailable' }
+      });
+    }
+
+    checkBackend();
+
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -137,7 +170,7 @@ function Home() {
       <section className="feed-header">
         <div>
           <Header as="h1">NeuralNet Social</Header>
-          <p>Fast posts, image sharing, likes, and recommendations powered by your backend API.</p>
+          <p>Fast posts, image sharing, likes, recommendations, and GraphQL reads from your backend API.</p>
         </div>
         <Input
           icon="search"
@@ -165,11 +198,12 @@ function Home() {
           )}
 
           {!loading && error && (
-            <Message negative icon>
+            <Message negative icon className="api-error">
               <Icon name="warning sign" />
               <Message.Content>
                 <Message.Header>Could not load posts</Message.Header>
-                {error}
+                <p>{error}</p>
+                <p className="muted small-text">The frontend is currently using {API_URL}.</p>
               </Message.Content>
             </Message>
           )}
@@ -220,16 +254,37 @@ function Home() {
         <Grid.Column width={6}>
           <aside className="side-rail">
             <Segment className="api-card">
-              <Header as="h3">Backend Connected</Header>
-              <p>Using REST for auth, posts, likes, uploads, and recommendations.</p>
-              <Statistic.Group size="mini" widths="two">
+              <div className="status-card-header">
+                <Header as="h3">Backend Status</Header>
+                <Label basic color={status.rest.state === 'online' && status.graphql.state === 'online' ? 'teal' : 'orange'}>
+                  {status.rest.state === 'online' && status.graphql.state === 'online' ? 'Connected' : 'Check setup'}
+                </Label>
+              </div>
+              <p>REST handles auth, posts, likes, uploads, and recommendations. GraphQL powers composed read queries.</p>
+              <div className="endpoint-list">
+                <div className={`endpoint-row ${status.rest.state}`}>
+                  <Icon name={status.rest.state === 'online' ? 'check circle' : 'circle notched'} />
+                  <div>
+                    <strong>{status.rest.label}</strong>
+                    <span>{API_URL}</span>
+                  </div>
+                </div>
+                <div className={`endpoint-row ${status.graphql.state}`}>
+                  <Icon name={status.graphql.state === 'online' ? 'check circle' : 'circle notched'} />
+                  <div>
+                    <strong>{status.graphql.label}</strong>
+                    <span>{GRAPHQL_URL}</span>
+                  </div>
+                </div>
+              </div>
+              <Statistic.Group size="mini" widths="two" className="feed-stats">
                 <Statistic>
                   <Statistic.Value>{posts.length}</Statistic.Value>
                   <Statistic.Label>Loaded</Statistic.Label>
                 </Statistic>
                 <Statistic>
-                  <Statistic.Value>{pagination.pages}</Statistic.Value>
-                  <Statistic.Label>Pages</Statistic.Label>
+                  <Statistic.Value>{pagination.total}</Statistic.Value>
+                  <Statistic.Label>Total</Statistic.Label>
                 </Statistic>
               </Statistic.Group>
             </Segment>
