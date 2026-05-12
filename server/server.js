@@ -11,6 +11,7 @@ const createGraphQLMiddleware = require('./graphql');
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
 const likeRoutes = require('./routes/likeRoutes');
+const commentRoutes = require('./routes/commentRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const requestLogger = require('./middleware/loggerMiddleware');
@@ -58,6 +59,7 @@ app.use('/api', uploadRoutes);
   // REST owns authentication, writes, uploads, and operational APIs.
   app.use('/api/auth', authRoutes);
   app.use('/api/posts', postRoutes);
+  app.use('/api/posts/:postId/comments', commentRoutes);
   app.use('/api/posts/:id', likeRoutes);
   app.use('/api/recommendations', recommendationRoutes);
   app.use('/api/uploads', uploadRoutes);

@@ -67,6 +67,13 @@ function Home() {
   }, []);
 
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      setPosts([]);
+      setPagination({ page: 1, pages: 1, total: 0 });
+      return undefined;
+    }
+
     const controller = new AbortController();
 
     async function loadPosts() {
@@ -93,7 +100,7 @@ function Home() {
     loadPosts();
 
     return () => controller.abort();
-  }, [page]);
+  }, [page, user]);
 
   useEffect(() => {
     if (!user) {
@@ -180,16 +187,44 @@ function Home() {
         />
       </section>
 
-      <Grid stackable columns={2}>
-        <Grid.Column width={10}>
-          {user && <PostForm onPostCreated={handlePostCreated} />}
+      {!user && (
+        <Segment className="center-state" style={{ padding: '3rem' }}>
+          <Header as="h2" icon>
+            <Icon name="lock" />
+            Authentication Required
+          </Header>
+          <p>Please log in to view posts and connect with the community.</p>
+          <Button
+            as={Link}
+            to="/login"
+            primary
+            size="large"
+            style={{ marginRight: '1rem' }}
+          >
+            Log In
+          </Button>
+          <Button
+            as={Link}
+            to="/register"
+            secondary
+            size="large"
+          >
+            Register
+          </Button>
+        </Segment>
+      )}
 
-          <div className="section-heading">
-            <Header as="h2">Recent Posts</Header>
-            <Label basic>
-              {pagination.total} total
-            </Label>
-          </div>
+      {user && (
+        <Grid stackable columns={2}>
+          <Grid.Column width={10}>
+            <PostForm onPostCreated={handlePostCreated} />
+
+            <div className="section-heading">
+              <Header as="h2">Recent Posts</Header>
+              <Label basic>
+                {pagination.total} total
+              </Label>
+            </div>
 
           {loading && (
             <Segment className="center-state">
@@ -248,10 +283,10 @@ function Home() {
                 <Icon name="chevron right" />
               </Button>
             </div>
-          )}
-        </Grid.Column>
+            )}
+          </Grid.Column>
 
-        <Grid.Column width={6}>
+          <Grid.Column width={6}>
           <aside className="side-rail">
             <Segment className="api-card">
               <div className="status-card-header">
@@ -318,10 +353,11 @@ function Home() {
                   </div>
                 )}
               </Segment>
-            )}
-          </aside>
-        </Grid.Column>
-      </Grid>
+              )}
+            </aside>
+          </Grid.Column>
+        </Grid>
+      )}
     </Container>
   );
 }

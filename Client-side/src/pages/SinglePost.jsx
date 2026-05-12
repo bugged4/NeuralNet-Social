@@ -19,6 +19,7 @@ import { AuthContext } from '../context/auth';
 import { api } from '../util/api';
 import LikeButton from '../components/LikeButton';
 import DeleteButton from '../components/DeleteButton';
+import CommentForm from '../components/CommentForm';
 import MyPopup from '../util/MyPopup';
 
 dayjs.extend(relativeTime);
@@ -161,7 +162,19 @@ function SinglePost() {
       </Card>
 
       <section className="comments-section">
-        <Header as="h3">Comments</Header>
+        <Header as="h3">Comments ({comments.length})</Header>
+        
+        <CommentForm 
+          postId={id} 
+          onCommentAdded={(newComment) => {
+            setPost(prev => ({
+              ...prev,
+              comments: [...prev.comments, newComment],
+              commentCount: prev.commentCount + 1
+            }));
+          }}
+        />
+
         {comments.length === 0 && (
           <Segment className="center-state">
             <p>No comments yet.</p>
@@ -175,6 +188,25 @@ function SinglePost() {
                 {comment.createdAt ? dayjs(comment.createdAt).fromNow() : 'just now'}
               </Card.Meta>
               <Card.Description>{comment.text || comment.body}</Card.Description>
+              {user && user.username === comment.username && (
+                <Button 
+                  size="mini" 
+                  negative
+                  icon="trash"
+                  onClick={async () => {
+                    try {
+                      await api.deleteComment(id, comment.id);
+                      setPost(prev => ({
+                        ...prev,
+                        comments: prev.comments.filter(c => c.id !== comment.id),
+                        commentCount: prev.commentCount - 1
+                      }));
+                    } catch (err) {
+                      console.error('Failed to delete comment:', err);
+                    }
+                  }}
+                />
+              )}
             </Card.Content>
           </Card>
         ))}

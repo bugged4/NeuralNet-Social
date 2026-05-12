@@ -148,6 +148,23 @@ export const api = {
     ...options
   }),
 
+  createComment: (postId, values, options) => request(`/api/posts/${postId}/comments`, {
+    method: 'POST',
+    body: JSON.stringify(values),
+    ...options
+  }),
+
+  deleteComment: (postId, commentId, options) => request(`/api/posts/${postId}/comments/${commentId}`, {
+    method: 'DELETE',
+    ...options
+  }),
+
+  updateComment: (postId, commentId, values, options) => request(`/api/posts/${postId}/comments/${commentId}`, {
+    method: 'PUT',
+    body: JSON.stringify(values),
+    ...options
+  }),
+
   getRecommendations: ({ page = 1, limit = 6, signal } = {}) => request(
     `/api/recommendations/posts${queryString({ page, limit })}`,
     { signal }

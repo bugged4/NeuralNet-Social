@@ -29,7 +29,11 @@ const uploadImage = async (req, res) => {
 
   res.status(201).json({
     success: true,
+    file:{
+      filename: result.public_id,
     url: result.secure_url,
+    }
+    
   });
 } ;
 

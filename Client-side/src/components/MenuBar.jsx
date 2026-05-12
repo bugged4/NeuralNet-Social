@@ -44,7 +44,11 @@ function MenuBar() {
                   <Icon name="user circle" />
                   {user.username}
                 </Menu.Item>
-                <Menu.Item name="logout" onClick={handleLogout} />
+                <Menu.Item
+                  name="logout"
+                  onClick={handleLogout}
+                  content="Logout"
+                />
               </>
             ) : (
               <>
